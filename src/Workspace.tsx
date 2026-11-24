@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowDownLeft, ArrowRight, ArrowUpRight, FileText, Plus, RefreshCw, Search, ShieldCheck } from 'lucide-react'
+import { ArrowDownLeft, ArrowRight, ArrowUpRight, FileText, Plus, RefreshCw } from 'lucide-react'
 import { deployment, listRequests, message, sameAddress, shortAddress } from './chain'
 import { savedDraft } from './documents'
-import { ErrorText, ReceiptArt, Status } from './ui'
+import { ErrorText, Status } from './ui'
+import { Landing } from './Landing'
 import { useWallet } from './wallet'
 
 type Page = Awaited<ReturnType<typeof listRequests>>
@@ -46,30 +47,19 @@ export function Workspace() {
   const visible = page?.records.filter(({ record }) => filter === 'All'
     || (filter === 'Sent' ? sameAddress(record.author, account) : sameAddress(record.reviewer, account))) ?? []
 
-  return <>
-    {!account && <section className="hero" aria-labelledby="home-title">
-      <div className="hero-content">
-        <span className="eyebrow"><span className="eyebrow-line" /> PUBLISHING APPROVALS</span>
-        <h1 id="home-title">Clear to<br /><em>publish.</em></h1>
-        <p>Agree on the exact text before it goes live.</p>
-        <div className="hero-actions">
-          <Link to="/new" className="button primary">Request approval <ArrowRight size={17} /></Link>
-          <Link to="/verify" className="button quiet">Verify a receipt <ArrowUpRight size={16} /></Link>
-        </div>
-      </div>
-      <div className="hero-visual"><ReceiptArt /></div>
-    </section>}
-    <section className="workspace" aria-labelledby="workspace-title">
+  if (!account) return <Landing connect={() => setOpen(true)} />
+
+  return <section className="workspace" aria-labelledby="workspace-title">
       <div className="section-heading">
         <div><h2 id="workspace-title">Your requests</h2><p>Review drafts and track decisions in one place.</p></div>
-        {account && <div className="workspace-actions">
+        <div className="workspace-actions">
           <button className="button secondary" type="button" onClick={() => setRefresh(i => i + 1)} disabled={busy}><RefreshCw size={16} /> Refresh</button>
           <Link to="/new" className="button primary"><Plus size={16} /> New request</Link>
-        </div>}
+        </div>
       </div>
-      {account && <div className="tabs" aria-label="Request filters">
+      <div className="tabs" aria-label="Request filters">
         {filters.map(item => <button key={item} type="button" aria-pressed={filter === item} onClick={() => setFilter(item)}>{item}</button>)}
-      </div>}
+      </div>
       <ErrorText>{error}</ErrorText>
       {busy && !page && <div className="request-panel" role="status"><div className="skeleton" /><div className="skeleton" /></div>}
       {visible.length > 0 && <ul className="request-panel request-list">
@@ -88,16 +78,9 @@ export function Workspace() {
       </ul>}
       {!busy && !error && visible.length === 0 && <div className="request-panel empty">
         <span className="icon-block"><FileText size={21} /></span>
-        <div><h3>{account ? 'No requests here yet' : 'Connect to see your requests'}</h3>
-          <p>{account ? 'Send a draft to get a recorded decision.' : 'Sent and received requests appear here.'}</p></div>
-        {!account && <button className="button quiet" type="button" onClick={() => setOpen(true)}>Connect wallet <ArrowRight size={16} /></button>}
+        <div><h3>No requests here yet</h3>
+          <p>Send a draft to get a recorded decision.</p></div>
       </div>}
       {!!page?.next && <button className="button secondary more" type="button" onClick={more} disabled={busy}>{busy ? 'Loading…' : 'Load more'}</button>}
     </section>
-    {!account && <section className="steps" aria-label="How it works">
-      <div><FileText size={20} /><strong>Send the exact draft</strong><p>Choose one reviewer.</p></div>
-      <div><ShieldCheck size={21} /><strong>Get a decision</strong><p>Your reviewer signs from their wallet.</p></div>
-      <div><Search size={20} /><strong>Share the receipt</strong><p>Anyone can verify the published text.</p></div>
-    </section>}
-  </>
 }

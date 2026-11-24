@@ -1,11 +1,12 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
+import { Link, Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import { ArrowRight, CircleAlert, SquareTerminal, Wallet } from 'lucide-react'
 import { deployment, message, shortAddress } from './chain'
 import { Compose } from './Compose'
 import { Receipt } from './Receipt'
 import { Verify } from './Verify'
 import { Workspace } from './Workspace'
+import { Docs, Faq } from './Help'
 import { ErrorText, Mark, Modal, walletGuide } from './ui'
 import { TransactionDialog, type Transaction } from './transaction'
 import { WalletProvider, useWallet } from './wallet'
@@ -50,7 +51,14 @@ function Layout() {
   const location = useLocation()
   const { active, open, setOpen } = useWallet()
   const [action, setAction] = useState<Transaction>()
-  useEffect(() => { window.scrollTo(0, 0) }, [location.pathname])
+  useEffect(() => {
+    const titles: Record<string, string> = { '/docs': 'Docs', '/faq': 'FAQ', '/new': 'New request', '/verify': 'Verify a receipt' }
+    const title = titles[location.pathname] ?? (location.pathname.startsWith('/requests/') ? 'Review receipt' : 'Publishing approvals')
+    document.title = title + ' · Relaymark'
+    if (location.pathname === '/docs' && location.hash) {
+      document.getElementById(location.hash.slice(1))?.scrollIntoView()
+    } else if (location.hash !== '#verify' && location.hash !== '#main') window.scrollTo(0, 0)
+  }, [location.pathname, location.hash])
 
   return <>
     <a className="skip" href="#main">Skip to content</a>
@@ -60,6 +68,8 @@ function Layout() {
         <nav aria-label="Primary">
           <NavLink to="/" end>Workspace</NavLink>
           <NavLink to="/verify">Verify</NavLink>
+          <NavLink to="/docs">Docs</NavLink>
+          <NavLink to="/faq">FAQ</NavLink>
         </nav>
         <button type="button" className="button wallet-button" aria-label={active ? 'Manage connected wallet' : 'Connect wallet'} onClick={() => setOpen(true)}>
           <Wallet size={17} /> <span>{active ? shortAddress(active.account) : 'Connect wallet'}</span>
@@ -73,6 +83,9 @@ function Layout() {
         <Route path="/new" element={<Compose setAction={setAction} />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="/requests/:id" element={<Receipt setAction={setAction} />} />
+        <Route path="/docs" element={<Docs />} />
+        <Route path="/faq" element={<Faq />} />
+        <Route path="/fqa" element={<Navigate to="/faq" replace />} />
         <Route path="*" element={<section className="inner-page"><div className="page-heading"><h1>Page not found</h1>
           <p>Try the workspace or check your link.</p></div><Link className="button primary" to="/">Open workspace <ArrowRight size={16} /></Link></section>} />
       </Routes>
@@ -80,7 +93,9 @@ function Layout() {
     <footer className="site-footer"><div className="shell footer-shell">
       <Link className="brand" to="/"><Mark /> <span>Relaymark</span></Link>
       <span>Publishing approvals on BNB Smart Chain</span>
-      <Link className="inline-link" to="/verify">Verify a receipt <ArrowRight size={14} /></Link>
+      <nav className="footer-links" aria-label="Footer">
+        <Link to="/verify">Verify</Link><Link to="/docs">Docs</Link><Link to="/faq">FAQ</Link>
+      </nav>
     </div></footer>
     {open && <WalletDialog />}
     {action && <TransactionDialog action={action} close={() => setAction(undefined)} />}
