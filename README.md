@@ -4,6 +4,10 @@ Approve the exact text of a joint launch, release, or public announcement. One
 Agent ID wallet submits a draft. A different Agent ID wallet records a decision.
 Anyone can check published text against the approval without connecting a wallet.
 
+- [Live app](https://relaymark-rho.vercel.app)
+- [BNB Smart Chain contract](https://bscscan.com/address/0x423b8701da3a251a3a3fc2d241b71e8d05744c91#code)
+- [Exact source match on Sourcify](https://repo.sourcify.dev/56/0x423B8701Da3a251a3A3fc2d241b71e8d05744C91)
+
 ## Product flow
 
 1. Open **New request**, enter the reviewer’s Agent ID wallet address, and paste or upload the exact text.
