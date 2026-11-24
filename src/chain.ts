@@ -119,7 +119,18 @@ export async function send(provider: EIP1193Provider, account: Address, intent: 
   if (!selected.some(address => sameAddress(address, account))) {
     throw new Error('The selected wallet changed. Reconnect and try again.')
   }
-  if (await wallet.getChainId() !== chain.id) await wallet.switchChain({ id: chain.id })
+  if (await wallet.getChainId() !== chain.id) {
+    try {
+      await wallet.switchChain({ id: chain.id })
+    } catch (error) {
+      const failure = error as { code?: number; message?: string }
+      if (chain.id !== 56 || (failure.code !== 4902
+          && !/unrecognized chain|unknown chain|chain not added/i.test(failure.message ?? ''))) throw error
+      await wallet.addChain({ chain })
+      if (await wallet.getChainId() !== chain.id) await wallet.switchChain({ id: chain.id })
+    }
+  }
+  if (await wallet.getChainId() !== chain.id) throw new Error('Switch your wallet to BNB Smart Chain and try again.')
   return wallet.sendTransaction({ account, chain, to: contract().address, data: calldata(intent), value: 0n })
 }
 
