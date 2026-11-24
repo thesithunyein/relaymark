@@ -10,15 +10,16 @@ Anyone can check published text against the approval without connecting a wallet
 
 ## Product flow
 
-1. Open **New request**, enter the reviewer’s Agent ID wallet address, and paste or upload the exact text.
+1. Open **New request** and enter the reviewer’s Agent ID wallet address. Check both Agent IDs, the sender’s network, and the estimated BNB fee before drafting.
 2. Confirm the request in your wallet. Share its review link. For longer or sensitive drafts, send the text file through your team's existing private channel alongside the public receipt.
 3. The designated reviewer opens the draft, confirms it matches the recorded fingerprint, and approves or declines from their own wallet.
-4. Share the public receipt alongside the published text. A change in the text needs a fresh request. The sender or reviewer can revoke an active approval.
+4. Share the public receipt alongside the published text. The sender or reviewer can revoke an active approval.
+5. If a draft needs edits, the reviewer can **Request changes**, which records a decline. The sender can then **Send revised version** from that receipt. The review link carries the earlier receipt for comparison. Both drafts are matched against their respective on-chain fingerprints before showing the changed lines.
 
 The contract records the text fingerprint, wallet addresses, timestamps and decision.
 It has no owner, admin key, upgrade mechanism, asset custody or payable functions.
 Hashes use Keccak-256 over UTF-8 text, with CRLF and CR normalized to LF. The title
-is a local label outside the fingerprint. Approval establishes the wallet’s decision
+and the earlier receipt selected for comparison live outside the fingerprint. Approval establishes the wallet’s decision
 on that fingerprint. Team affiliation and the accuracy of the text are external to the receipt.
 
 The review link includes the draft in its browser fragment. It can be read by anyone

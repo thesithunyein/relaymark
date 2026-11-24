@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Fingerprint, ShieldCheck } from 'lucide-react'
-import { parseReceipt } from './documents'
+import { parseReceipt, receiptPath } from './documents'
 import { ErrorText } from './ui'
 import { deployment } from './chain'
 
@@ -14,7 +14,7 @@ export function Verify() {
     event.preventDefault()
     const parsed = parseReceipt(input)
     if (!parsed) { setError('Enter a Relaymark receipt link or request number.'); return }
-    navigate('/requests/' + parsed.id + parsed.fragment + (parsed.fragment ? '' : '#verify'))
+    navigate(receiptPath(parsed.id, parsed.previous) + (parsed.fragment || '#verify'))
   }
 
   return <section className="inner-page verify-page">

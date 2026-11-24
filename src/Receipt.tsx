@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { ArrowDown, ArrowLeft, Check, Download, FileText, Fingerprint, Link2, ShieldCheck, X } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowRight, Check, Download, FileText, Fingerprint, Link2, RefreshCw, ShieldCheck, X } from 'lucide-react'
 import type { Hex } from 'viem'
 import { deployment, getReceiptTransactions, getRecord, message, parseId, sameAddress, shortAddress, type Intent, type RecordData } from './chain'
-import { byteLength, downloadText, fingerprint, linkedDraft, maxBytes, reviewFragment, savedDraft, saveDraft, type Draft } from './documents'
+import { byteLength, downloadText, fingerprint, linkedDraft, maxBytes, previousReceipt, receiptPath, reviewFragment, savedDraft, saveDraft, type Draft } from './documents'
+import { ReceiptComparison } from './ReceiptComparison'
 import { CopyButton, ErrorText, ExplorerLink, Status, Upload } from './ui'
 import { useWallet } from './wallet'
 import type { Transaction } from './transaction'
@@ -44,7 +45,9 @@ function ReceiptScreen({ id, setAction }: { id: bigint; setAction: (action: Tran
   const [verifiedStatus, setVerifiedStatus] = useState<number>()
   const [verifying, setVerifying] = useState(false)
   const verifyRef = useRef<HTMLDivElement>(null)
-  const bare = window.location.origin + '/requests/' + id
+  const requestedPrevious = previousReceipt(location.search) ?? (draft.previous ? parseId(draft.previous) : undefined)
+  const previous = requestedPrevious && requestedPrevious < id ? requestedPrevious : undefined
+  const bare = window.location.origin + receiptPath(id, previous)
   const isAuthor = sameAddress(active?.account, record?.author)
   const isReviewer = sameAddress(active?.account, record?.reviewer)
   const match = Boolean(record && draft.body && fingerprint(draft.body) === record.digest)
@@ -83,11 +86,11 @@ function ReceiptScreen({ id, setAction }: { id: bigint; setAction: (action: Tran
     let live = true
     setShare(undefined)
     if (match) {
-      reviewFragment(draft).then(fragment => { if (live) setShare(fragment ? bare + fragment : undefined) })
+      reviewFragment({ ...draft, previous: previous?.toString() }).then(fragment => { if (live) setShare(fragment ? bare + fragment : undefined) })
         .catch(() => { /* Long drafts can be downloaded instead. */ })
     }
     return () => { live = false }
-  }, [bare, draft, match])
+  }, [bare, draft, match, previous])
 
   function act(intent: Intent, title: string, description: string) {
     if (!deployment || !active) { setOpen(true); return }
@@ -96,7 +99,7 @@ function ReceiptScreen({ id, setAction }: { id: bigint; setAction: (action: Tran
       onSuccess: receipt => {
         setTransaction(receipt.transactionHash)
         setResult(undefined)
-        if (match) saveDraft(id, draft)
+        if (match) saveDraft(id, { ...draft, previous: previous?.toString() })
         setRefresh(value => value + 1)
       },
     })
@@ -132,7 +135,11 @@ function ReceiptScreen({ id, setAction }: { id: bigint; setAction: (action: Tran
       <div className="page-heading receipt-heading">
         <div><span className="receipt-number">REQUEST #{id.toString()}</span>
           <h1>{match ? draft.title : 'Review receipt'}</h1><p>Recorded {displayDate(record.createdAt)}</p></div>
-        <Status status={record.status} />
+        <div className="receipt-heading-actions">
+          <Status status={record.status} />
+          <button className="icon-button" type="button" aria-label="Refresh receipt"
+            onClick={() => { setResult(undefined); setRefresh(value => value + 1) }}><RefreshCw size={16} /></button>
+        </div>
       </div>
       {location.state?.justCreated && <p role="status" className="info success"><Check size={17} /> Request recorded. Send the review link to your reviewer.</p>}
       {transaction && <p role="status" className="info success"><Check size={17} /> Decision recorded. <ExplorerLink type="tx" value={transaction}>View transaction</ExplorerLink></p>}
@@ -153,7 +160,7 @@ function ReceiptScreen({ id, setAction }: { id: bigint; setAction: (action: Tran
             {record.status === 1 && <div className="decision-actions">
               {!active && <button className="button secondary" type="button" onClick={() => setOpen(true)}>Connect to review</button>}
               {isReviewer && <>
-                <button className="button secondary" type="button" onClick={() => act({ functionName: 'decide', args: [id, false] }, 'Decline request', 'Record a decline for this request.')}>Decline</button>
+                <button className="button secondary" type="button" onClick={() => act({ functionName: 'decide', args: [id, false] }, 'Request changes', 'Close this version as declined so the sender can submit a revision. Share this receipt with the sender.')}>Request changes</button>
                 <button className="button primary" type="button" disabled={!match} onClick={() => act({ functionName: 'decide', args: [id, true] }, 'Approve this version', 'Record approval for the matching draft.')}><Check size={17} /> Approve draft</button>
                 {!match && <p className="hint">Open a matching draft to approve.</p>}
               </>}
@@ -161,7 +168,11 @@ function ReceiptScreen({ id, setAction }: { id: bigint; setAction: (action: Tran
             </div>}
             {record.status === 2 && (isAuthor || isReviewer) && <button className="text-button danger" type="button"
               onClick={() => act({ functionName: isAuthor ? 'withdraw' : 'revokeApproval', args: [id] }, 'Revoke approval', 'Mark the existing approval as revoked.')}>Revoke approval</button>}
+            {isAuthor && record.status > 1 && <div className="decision-actions">
+              <Link className="button secondary" to={'/new?from=' + id}>Send revised version <ArrowRight size={16} /></Link>
+            </div>}
           </section>
+          {previous && <ReceiptComparison key={previous.toString()} previous={previous} current={record} currentText={match ? draft.body : ''} />}
           <div className="panel form-panel" ref={verifyRef}>
             <form onSubmit={verify}>
               <div className="field-row"><h2><Fingerprint size={20} /> Verify text</h2>

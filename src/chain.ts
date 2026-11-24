@@ -113,7 +113,17 @@ export async function simulate(account: Address, intent: Intent) {
   await client.call({ account, to: contract().address, data: calldata(intent), value: 0n })
 }
 
-export async function send(provider: EIP1193Provider, account: Address, intent: Intent) {
+export async function checkGas(account: Address, intent: Intent) {
+  const balance = await client.getBalance({ address: account })
+  if (balance === 0n) throw new Error('Add BNB on BNB Smart Chain to this wallet for network fees.')
+  const [gas, rate] = await Promise.all([
+    client.estimateGas({ account, to: contract().address, data: calldata(intent), value: 0n }),
+    client.getGasPrice(),
+  ])
+  if (balance < gas * rate) throw new Error('This wallet needs more BNB on BNB Smart Chain for the estimated network fee.')
+}
+
+export async function prepareWallet(provider: EIP1193Provider, account: Address) {
   const wallet = createWalletClient({ chain, transport: custom(provider) })
   const selected = await wallet.getAddresses()
   if (!selected.some(address => sameAddress(address, account))) {
@@ -131,6 +141,11 @@ export async function send(provider: EIP1193Provider, account: Address, intent: 
     }
   }
   if (await wallet.getChainId() !== chain.id) throw new Error('Switch your wallet to BNB Smart Chain and try again.')
+  return wallet
+}
+
+export async function send(provider: EIP1193Provider, account: Address, intent: Intent) {
+  const wallet = await prepareWallet(provider, account)
   return wallet.sendTransaction({ account, chain, to: contract().address, data: calldata(intent), value: 0n })
 }
 

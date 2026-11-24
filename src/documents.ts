@@ -3,11 +3,30 @@ import { chain, deployment, parseId } from './chain'
 
 export const maxBytes = 256_000
 const encoder = new TextEncoder()
-export type Draft = { title: string; body: string }
+export type Draft = { title: string; body: string; previous?: string }
 
 export const byteLength = (text: string) => encoder.encode(text).byteLength
 export const normalize = (text: string) => text.replace(/\r\n?/g, '\n')
 export const fingerprint = (text: string) => keccak256(toBytes(normalize(text)))
+
+export function previousReceipt(search: string) {
+  return parseId(new URLSearchParams(search).get('previous') ?? '')
+}
+
+export function receiptPath(id: bigint, previous?: bigint) {
+  return '/requests/' + id + (previous ? '?previous=' + previous : '')
+}
+
+export function changedLines(before: string, after: string) {
+  const left = normalize(before).split('\n')
+  const right = normalize(after).split('\n')
+  let start = 0
+  let end = 0
+  while (start < left.length && start < right.length && left[start] === right[start]) start++
+  while (end < left.length - start && end < right.length - start
+    && left[left.length - 1 - end] === right[right.length - 1 - end]) end++
+  return { before: left.slice(start, left.length - end).join('\n'), after: right.slice(start, right.length - end).join('\n') }
+}
 
 const storagePrefix = () => 'relaymark/1/' + chain.id + '/' + deployment
 const key = (id: bigint) => storagePrefix() + '/' + id
@@ -17,6 +36,7 @@ export function validDraft(input: unknown): input is Draft {
   const draft = input as Partial<Draft>
   return typeof draft.title === 'string' && draft.title.trim().length > 0 && draft.title.length <= 100
     && typeof draft.body === 'string' && draft.body.trim().length > 0 && byteLength(draft.body) <= maxBytes
+    && (draft.previous === undefined || (typeof draft.previous === 'string' && Boolean(parseId(draft.previous))))
 }
 
 export function saveDraft(id: bigint, draft: Draft) {
@@ -75,13 +95,16 @@ export async function linkedDraft(hash: string) {
 export function parseReceipt(input: string) {
   const value = input.trim()
   const direct = parseId(value)
-  if (direct) return { id: direct, fragment: '' }
+  if (direct) return { id: direct, fragment: '', previous: undefined }
   try {
     const url = new URL(value, window.location.origin)
-    if (url.origin !== window.location.origin || url.search) return undefined
+    if (url.origin !== window.location.origin) return undefined
+    const search = new URLSearchParams(url.search)
+    if ([...search.keys()].some(key => key !== 'previous') || search.getAll('previous').length > 1) return undefined
     const match = /^\/requests\/([^/]+)\/?$/.exec(url.pathname)
     const id = match && parseId(match[1])
-    return id ? { id, fragment: url.hash.startsWith('#draft=') ? url.hash : '' } : undefined
+    const previous = previousReceipt(url.search)
+    return id ? { id, previous: previous && previous < id ? previous : undefined, fragment: url.hash.startsWith('#draft=') ? url.hash : '' } : undefined
   } catch { return undefined }
 }
 
@@ -100,10 +123,14 @@ export function downloadText(title: string, body: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1_000)
 }
 
-export function readComposition(account?: Address) {
+function compositionKey(account: Address, previous?: bigint) {
+  return storagePrefix() + '/draft/' + account + (previous ? '/' + previous : '')
+}
+
+export function readComposition(account?: Address, previous?: bigint) {
   if (!account) return
   try {
-    const value = JSON.parse(localStorage.getItem(storagePrefix() + '/draft/' + account) ?? 'null') as unknown
+    const value = JSON.parse(localStorage.getItem(compositionKey(account, previous)) ?? 'null') as unknown
     if (!value || typeof value !== 'object') return
     const draft = value as { title?: unknown; body?: unknown; reviewer?: unknown }
     if (typeof draft.title === 'string' && typeof draft.body === 'string' && typeof draft.reviewer === 'string') {
@@ -112,9 +139,9 @@ export function readComposition(account?: Address) {
   } catch { /* The editor still works without storage. */ }
 }
 
-export function writeComposition(account: Address, data?: Draft & { reviewer: string }) {
+export function writeComposition(account: Address, data?: Draft & { reviewer: string }, previous?: bigint) {
   try {
-    const key = storagePrefix() + '/draft/' + account
+    const key = compositionKey(account, previous)
     if (data) localStorage.setItem(key, JSON.stringify(data))
     else localStorage.removeItem(key)
   } catch { /* The editor still works without storage. */ }

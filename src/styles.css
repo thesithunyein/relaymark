@@ -107,6 +107,12 @@ h1 { font-family: var(--serif); font-weight: 510; letter-spacing: -.045em; line-
 .panel, .sidebar { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
 .form-panel { padding: clamp(16px, 3vw, 28px); }
 .field + .field { margin-top: 19px; }
+.wallet-check-field, .wallet-check-button { margin-top: 13px; }
+.comparison-meta, .comparison-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 12px 0; }
+.comparison-meta > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.comparison-grid .before { background: #faf0eb; border-color: #ecdcd3; }
+.comparison-grid .after { background: #eef3e9; border-color: #dce6d6; }
+.comparison-grid .paper-text { min-height: 46px; }
 label { display: block; margin-bottom: 6px; color: var(--ink); font-weight: 800; font-size: 13px; }
 input, textarea { display: block; width: 100%; border: 1px solid var(--line-strong); border-radius: 8px; background: #fffefa; color: var(--ink); padding: 12px; min-height: 44px; }
 input::placeholder, textarea::placeholder { color: #6e766a; }
@@ -132,6 +138,7 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
 .verify-note { margin-top: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
 .receipt-heading { align-items: flex-end; }
 .receipt-heading > div { min-width: 0; }
+.receipt-heading-actions { display: flex; align-items: center; gap: 3px; }
 .receipt-number { display: inline-block; color: var(--muted); font-size: 11px; letter-spacing: .13em; font-weight: 800; margin-bottom: 8px; }
 .receipt-content { display: grid; gap: 15px; }
 .receipt-content h2 { font-size: 16px; display: inline-flex; align-items: center; gap: 8px; }
@@ -210,6 +217,7 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
   .footer-shell > span { order: 3; width: 100%; }
   .inner-page { padding-block: 20px 42px; }
   .work-grid { grid-template-columns: 1fr; }
+  .comparison-grid { grid-template-columns: 1fr; }
   .form-panel { padding: 15px; }
   .request-row { grid-template-columns: 35px 1fr auto; gap: 7px; padding: 9px; }
   .request-row .icon-block { width: 35px; height: 35px; }
