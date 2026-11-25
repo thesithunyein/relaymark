@@ -98,7 +98,7 @@ relaymark/
 ├── contracts/
 │   └── Relaymark.sol           Immutable approval ledger
 ├── public/
-│   └── favicon.svg             Transparent app and README mark
+│   └── favicon.svg             Browser tab and README mark
 ├── scripts/
 │   └── deploy-wallet.mjs        Local browser-wallet deployment
 ├── src/
@@ -110,6 +110,8 @@ relaymark/
 │   ├── ReceiptComparison.tsx    Verified draft comparison
 │   ├── Verify.tsx               Public receipt lookup
 │   ├── Workspace.tsx            Requests by wallet
+│   ├── assets/
+│   │   └── relaymark.svg        In-app navigation mark
 │   ├── chain.ts                 RPC, contract calls, and confirmation
 │   ├── documents.ts             Hashing, review links, and browser storage
 │   ├── main.tsx                 App entry point

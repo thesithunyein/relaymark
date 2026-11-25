@@ -2,10 +2,9 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { ArrowDownToLine, ArrowUpRight, Check, Copy, X } from 'lucide-react'
 import { labels, explorer } from './chain'
 import { readText } from './documents'
+import markSource from './assets/relaymark.svg'
 
 export const walletGuide = 'https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/external-sign.md'
-
-const markSource = '/favicon.svg'
 
 export function Mark({ className = '' }: { className?: string }) {
   return <img className={className} src={markSource} width="36" height="36" alt="" />
