@@ -190,8 +190,11 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
 .dialog-heading h2 { font-size: 34px; line-height: 1; font-weight: 700; letter-spacing: -.033em; }
 .dialog-heading .icon-button { margin: -5px -7px 0 0; }
 .dialog-copy { font-size: 13px; color: var(--muted); margin: 8px 0 14px; }
-.wallet-option { width: 100%; min-height: 48px; display: grid; grid-template-columns: 20px 1fr auto; gap: 10px; align-items: center; text-align: left; background: var(--canvas); border: 1px solid var(--line); padding: 0 10px; border-radius: 8px; margin: 6px 0; color: var(--action); font-weight: 750; }
-.wallet-option:hover { background: var(--soft); }
+.wallet-option { width: 100%; min-height: 48px; display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px; align-items: center; text-align: left; background: var(--canvas); border: 1px solid var(--line); border-radius: 8px; margin: 6px 0; padding: 7px 10px; color: var(--action); font-weight: 750; }
+.wallet-option:not(:disabled):hover { background: var(--soft); }
+.wallet-option:disabled:has(small) { opacity: 1; color: var(--muted); }
+.wallet-option small { display: block; margin-top: 3px; font-size: 12px; font-weight: 400; }
+.wallet-logo { display: block; width: 24px; height: 24px; object-fit: contain; border-radius: 5px; }
 .cli-instructions { display: grid; gap: 7px; margin: 8px 0; }
 .cli-instructions p svg { vertical-align: middle; }
 .cli-instructions .button { justify-self: start; }

@@ -2,7 +2,17 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { getAddress, type Address, type EIP1193Provider } from 'viem'
 import { addressInput } from './chain'
 
-type WalletChoice = { name: string; id: string; provider: EIP1193Provider }
+type WalletChoice = {
+  name: string
+  id: string
+  provider: EIP1193Provider
+  icon?: string
+  unavailable?: string
+}
+type ProviderAnnouncement = {
+  provider: EIP1193Provider
+  info: { uuid: string; name: string; icon?: string; rdns?: string }
+}
 type Active = { account: Address; provider?: EIP1193Provider; name: string }
 type WalletContext = {
   active?: Active
@@ -23,11 +33,21 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const add = (event: Event) => {
-      const detail = (event as CustomEvent<{ provider: EIP1193Provider; info: { uuid: string; name: string } }>).detail
-      if (!detail?.provider?.request || !detail.info?.uuid) return
+      const detail = (event as CustomEvent<ProviderAnnouncement>).detail
+      if (typeof detail?.provider?.request !== 'function' || typeof detail.info?.uuid !== 'string'
+          || !detail.info.uuid || typeof detail.info.name !== 'string' || !detail.info.name.trim()) return
       const { provider, info } = detail
-      setChoices(current => current.some(item => item.provider === provider)
-        ? current : [...current, { provider, name: info.name, id: info.uuid }])
+      const name = info.name.trim()
+      const icon = typeof info.icon === 'string' && /^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(info.icon)
+        ? info.icon : undefined
+      // QoreX announces an EVM provider for account and chain reads only.
+      const unavailable = info.rdns === 'network.qore.qorex' || (!info.rdns && name.toLowerCase() === 'qorex')
+        ? 'BNB Smart Chain signing unavailable.' : undefined
+      setChoices(current => {
+        const announced = current.filter(item => item.id !== 'injected')
+        if (announced.some(item => item.provider === provider || item.id === info.uuid)) return current
+        return [...announced, { provider, name, id: info.uuid, icon, unavailable }]
+      })
     }
     window.addEventListener('eip6963:announceProvider', add)
     window.dispatchEvent(new Event('eip6963:requestProvider'))
@@ -57,6 +77,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, [active?.provider])
 
   const connect = async (choice: WalletChoice) => {
+    if (choice.unavailable) throw new Error(choice.unavailable)
     const accounts = await choice.provider.request({ method: 'eth_requestAccounts' })
     if (!accounts[0]) throw new Error('Choose an account in your wallet.')
     setActive({ account: getAddress(accounts[0]), name: choice.name, provider: choice.provider })

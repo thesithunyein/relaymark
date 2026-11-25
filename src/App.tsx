@@ -11,6 +11,13 @@ import { ErrorText, Mark, Modal, walletGuide } from './ui'
 import { TransactionDialog, type Transaction } from './transaction'
 import { WalletProvider, useWallet } from './wallet'
 
+function WalletLogo({ icon }: { icon?: string }) {
+  const [failedIcon, setFailedIcon] = useState<string>()
+  return icon && icon !== failedIcon
+    ? <img className="wallet-logo" src={icon} alt="" onError={() => setFailedIcon(icon)} />
+    : <Wallet size={20} aria-hidden="true" />
+}
+
 function WalletDialog() {
   const { active, choices, connect, useCli, disconnect, setOpen } = useWallet()
   const [advanced, setAdvanced] = useState(false)
@@ -28,11 +35,15 @@ function WalletDialog() {
     {active ? <><p className="dialog-copy">{active.name}</p><p className="full-address">{active.account}</p>
       <button className="button secondary" type="button" onClick={disconnect}>Disconnect</button></> : <>
       <p className="dialog-copy">Use the wallet that holds your Agent ID.</p>
-      {choices.map(choice => <button key={choice.id} className="wallet-option" type="button" disabled={busy}
+      {choices.map(choice => <button key={choice.id} className="wallet-option" type="button" disabled={busy || !!choice.unavailable}
         onClick={async () => {
           setBusy(true); setError('')
           try { await connect(choice) } catch (err) { setError(message(err)) } finally { setBusy(false) }
-        }}><Wallet size={19} /><span>{choice.name}</span><ArrowRight size={16} /></button>)}
+        }}>
+        <WalletLogo icon={choice.icon} />
+        <span>{choice.name}{choice.unavailable && <small>{choice.unavailable}</small>}</span>
+        {!choice.unavailable && <ArrowRight size={16} aria-hidden="true" />}
+      </button>)}
       {!choices.length && <p className="hint">Open Relaymark in a wallet browser, or use the wallet CLI.</p>}
       <button className="text-button" type="button" aria-expanded={advanced} onClick={() => setAdvanced(value => !value)}><SquareTerminal size={16} /> Use wallet CLI</button>
       {advanced && <form onSubmit={manual} className="cli-instructions">
