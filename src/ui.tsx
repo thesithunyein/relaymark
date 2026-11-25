@@ -6,7 +6,7 @@ import { readText } from './documents'
 export const walletGuide = 'https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/external-sign.md'
 
 export function Mark({ className = '' }: { className?: string }) {
-  return <img className={className} src="/favicon.svg" width="35" height="35" alt="" />
+  return <img className={className} src="/favicon.svg" width="36" height="36" alt="" />
 }
 
 export function ReceiptArt() {
