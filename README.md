@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/favicon.svg" width="80" height="80" alt="Relaymark logo">
+  <img src="public/favicon.png" width="80" height="80" alt="Relaymark logo">
 </p>
 
 <h1 align="center">Relaymark</h1>
@@ -98,7 +98,7 @@ relaymark/
 ├── contracts/
 │   └── Relaymark.sol           Immutable approval ledger
 ├── public/
-│   └── favicon.svg             Browser tab and README mark
+│   └── favicon.png             Original browser tab and README logo
 ├── scripts/
 │   └── deploy-wallet.mjs        Local browser-wallet deployment
 ├── src/
