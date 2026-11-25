@@ -1,14 +1,15 @@
 import { Link } from 'react-router-dom'
 import {
-  ArrowRight, ArrowUpRight, FileCheck2, FileText, Fingerprint, GitCompareArrows,
-  Handshake, LockKeyhole, Megaphone, PackageCheck, PenLine, ShieldCheck,
+  ArrowRight, ArrowUpRight, BookOpen, CircleHelp, FileCheck2, FileText, Fingerprint,
+  GitCompareArrows, Handshake, LockKeyhole, Megaphone, PackageCheck, PenLine,
 } from 'lucide-react'
 import { ReceiptArt } from './ui'
+import { ReceiptLookup } from './Verify'
 
 const steps = [
-  { icon: FileText, title: 'Send a draft', text: 'Add the exact text and choose one reviewer.' },
-  { icon: PenLine, title: 'Get a decision', text: 'Your reviewer approves or requests changes from their wallet.' },
-  { icon: FileCheck2, title: 'Publish with proof', text: 'Share a receipt anyone can check against the published text.' },
+  { icon: FileText, title: 'Send the exact draft', text: 'Choose one reviewer.' },
+  { icon: PenLine, title: 'Get a decision', text: 'Approve or request changes.' },
+  { icon: FileCheck2, title: 'Share the receipt', text: 'Anyone can check the published text.' },
 ]
 
 const useCases = [
@@ -17,85 +18,68 @@ const useCases = [
   { icon: Megaphone, title: 'Public statements', text: 'Get sign-off before an update reaches your audience.' },
 ]
 
-function RevisionArt() {
-  return <div className="revision-art" aria-hidden="true">
-    <div className="revision-sheet revision-sheet-before">
-      <span><FileText size={17} /> Earlier draft</span><i /><i /><i />
-    </div>
-    <div className="revision-sheet revision-sheet-after">
-      <span><ShieldCheck size={17} /> Revised draft</span><i /><i /><i />
-    </div>
-  </div>
-}
-
-export function Landing({ connect }: { connect: () => void }) {
-  return <>
-    <section className="hero" aria-labelledby="home-title">
-      <div className="hero-content">
-        <h1 id="home-title">Clear to <span>publish.</span></h1>
-        <p>Agree on the exact text before it goes live.</p>
-        <div className="hero-actions">
-          <Link to="/new" className="button primary">Request approval <ArrowRight size={17} /></Link>
-          <Link to="/verify" className="button quiet">Verify a receipt <ArrowUpRight size={16} /></Link>
+export function Landing() {
+  return <div className="landing">
+    <section className="launch-board" aria-labelledby="home-title">
+      <div className="launch-primary">
+        <div className="launch-copy">
+          <p className="launch-label"><FileCheck2 size={17} aria-hidden="true" /> Publishing approvals</p>
+          <h1 id="home-title">Clear to <span>publish.</span></h1>
+          <p className="launch-summary">Agree on the exact text before it goes live.</p>
+        </div>
+        <div className="launch-art"><ReceiptArt /></div>
+        <div className="launch-actions">
+          <Link to="/new" className="button primary">Request approval <ArrowRight size={19} /></Link>
         </div>
       </div>
-      <div className="hero-visual"><ReceiptArt /></div>
-    </section>
 
-    <section className="landing-section" aria-labelledby="workflow-title">
-      <h2 id="workflow-title">From draft to sign-off.</h2>
-      <div className="landing-steps">
-        {steps.map(({ icon: Icon, title, text }) => <article key={title}>
-          <span className="icon-block"><Icon size={22} aria-hidden="true" /></span>
-          <h3>{title}</h3><p>{text}</p>
-        </article>)}
+      <div className="board-tools">
+        <section className="board-card lookup-card" aria-labelledby="lookup-title">
+          <div className="board-card-title">
+            <div><h2 id="lookup-title">Verify a receipt</h2>
+              <p>Check published text against an approval.</p></div>
+            <span className="board-icon"><Fingerprint size={24} aria-hidden="true" /></span>
+          </div>
+          <ReceiptLookup embedded />
+          <p className="board-note"><LockKeyhole size={14} aria-hidden="true" /> No wallet needed to verify.</p>
+        </section>
+
+        <section className="board-card workflow-card" aria-labelledby="workflow-title">
+          <div className="board-card-title">
+            <h2 id="workflow-title">How it works</h2>
+            <Link to="/docs" className="inline-link">Read the guide <ArrowUpRight size={15} /></Link>
+          </div>
+          <ol className="workflow-list">
+            {steps.map(({ icon: Icon, title, text }) => <li key={title}>
+              <span className="board-icon"><Icon size={19} aria-hidden="true" /></span>
+              <div><h3>{title}</h3><p>{text}</p></div>
+            </li>)}
+          </ol>
+        </section>
+
+        <div className="board-links">
+          <Link to="/docs#revisions"><GitCompareArrows size={20} aria-hidden="true" /><span>Compare versions</span><ArrowUpRight size={15} aria-hidden="true" /></Link>
+          <Link to="/docs#records"><LockKeyhole size={19} aria-hidden="true" /><span>Draft privacy</span><ArrowUpRight size={15} aria-hidden="true" /></Link>
+        </div>
       </div>
     </section>
 
-    <section className="landing-section" aria-labelledby="proof-title">
-      <h2 id="proof-title">Know exactly what was approved.</h2>
-      <div className="landing-features">
-        <article className="feature-card feature-revision">
-          <div className="feature-copy">
-            <GitCompareArrows size={24} aria-hidden="true" />
-            <h3>Review the changes.</h3>
-            <p>Compare drafts and see which version received approval.</p>
-            <Link to="/docs#revisions" className="inline-link">How revisions work <ArrowUpRight size={15} /></Link>
-          </div>
-          <RevisionArt />
-        </article>
-        <article className="feature-card feature-receipt">
-          <div className="feature-copy">
-            <Fingerprint size={24} aria-hidden="true" />
-            <h3>Check any receipt.</h3>
-            <p>Paste the published text to see whether it matches the approved version.</p>
-            <Link to="/verify" className="inline-link">Verify text <ArrowUpRight size={15} /></Link>
-          </div>
-          <div className="fingerprint-visual">
-            <div className="fingerprint-ring" aria-hidden="true"><Fingerprint size={109} strokeWidth={1.05} /></div>
-            <span><LockKeyhole size={17} aria-hidden="true" /> Draft text stays off-chain</span>
-          </div>
-        </article>
+    <section className="landing-uses" aria-labelledby="use-title">
+      <div className="landing-section-title">
+        <h2 id="use-title">For teams that publish together.</h2>
+        <p>Use Relaymark when the wording needs a second sign-off.</p>
       </div>
-    </section>
-
-    <section className="landing-section landing-use" aria-labelledby="use-title">
-      <div><h2 id="use-title">For teams that publish together.</h2>
-        <p>Use Relaymark when the exact wording needs a second sign-off.</p></div>
       <div className="use-list">
         {useCases.map(({ icon: Icon, title, text }) => <article key={title}>
-          <Icon size={20} aria-hidden="true" /><div><h3>{title}</h3><p>{text}</p></div>
+          <Icon size={22} aria-hidden="true" />
+          <div><h3>{title}</h3><p>{text}</p></div>
         </article>)}
       </div>
     </section>
 
-    <section className="landing-resources" aria-labelledby="resources-title">
-      <div><h2 id="resources-title">Ready to get started?</h2>
-        <p>Connect to see your requests, or learn how Relaymark works.</p></div>
-      <div className="resource-actions">
-        <button type="button" className="button primary" onClick={connect}>Connect wallet <ArrowRight size={17} /></button>
-        <Link to="/docs" className="button secondary">Read the docs</Link>
-      </div>
-    </section>
-  </>
+    <nav className="landing-help" aria-label="Product help">
+      <Link to="/docs"><BookOpen size={19} aria-hidden="true" /> Docs <ArrowUpRight size={14} aria-hidden="true" /></Link>
+      <Link to="/faq"><CircleHelp size={19} aria-hidden="true" /> FAQ <ArrowUpRight size={14} aria-hidden="true" /></Link>
+    </nav>
+  </div>
 }

@@ -1,7 +1,6 @@
 # Relaymark
 
-Warm white canvas, ink-green actions, and lime reserved for the mark and illustration.
-Use Outfit Variable throughout, including headings and review text. Strong type
-hierarchy, generous margins and warm-gray borders make the workspace easy to scan.
-The original relay mark joins two forms at a
-shared edge. Use short verbs for actions and explain gas, link sharing, and withdrawal in context.
+Pale olive canvas, lime for the primary feature, and ink green for actions.
+Use Outfit Variable throughout. Set clear headings and group related tools on
+quiet, rounded panels. The relay mark joins two forms at a shared edge.
+Use short verbs for actions and explain gas, link sharing, and withdrawal in context.

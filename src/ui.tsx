@@ -10,7 +10,7 @@ export function Mark({ className = '' }: { className?: string }) {
 }
 
 export function ReceiptArt() {
-  return <svg className="receipt-art" viewBox="0 0 548 375" fill="none" aria-hidden="true">
+  return <svg className="receipt-art" viewBox="72 38 410 302" fill="none" aria-hidden="true">
     <defs>
       <pattern id="graph" width="25" height="25" patternUnits="userSpaceOnUse">
         <path d="M25 0H0v25" stroke="#cdd3be" strokeOpacity=".55"/>
@@ -18,20 +18,13 @@ export function ReceiptArt() {
       <linearGradient id="paper" x1="99" x2="312" y1="52" y2="332" gradientUnits="userSpaceOnUse">
         <stop stopColor="#fffef8"/><stop offset="1" stopColor="#efeee0"/>
       </linearGradient>
-      <linearGradient id="tile" x1="136" x2="453" y1="24" y2="377" gradientUnits="userSpaceOnUse">
-        <stop stopColor="#f0f3e6"/><stop offset="1" stopColor="#dce7cb"/>
-      </linearGradient>
-      <radialGradient id="light"><stop stopColor="#f7f8ef"/><stop offset="1" stopColor="#e8eedc" stopOpacity="0"/></radialGradient>
       <filter id="shadow" x="-30%" y="-25%" width="160%" height="175%">
         <feDropShadow dx="0" dy="14" stdDeviation="12" floodColor="#37452f" floodOpacity=".15"/>
       </filter>
     </defs>
-    <rect width="548" height="375" rx="22" fill="url(#tile)"/>
-    <rect x="18" y="18" width="512" height="339" rx="12" fill="url(#graph)" opacity=".78"/>
-    <ellipse cx="243" cy="135" rx="217" ry="157" fill="url(#light)" opacity=".9"/>
+    <rect x="72" y="38" width="410" height="302" rx="28" fill="url(#graph)" opacity=".55"/>
     <circle cx="277" cy="181" r="147" stroke="#aebc9f" strokeOpacity=".7" strokeDasharray="2 6"/>
     <circle cx="277" cy="181" r="109" stroke="#b8c4a8" strokeOpacity=".73"/>
-    <path d="M43 48h16m-8-8v16m436 276h16m-8-8v16M43 326h16m-8-8v16m436-278h16m-8-8v16" stroke="#99aa8b" strokeLinecap="round"/>
     <path d="M109 214h29m-15-15v30m296-91h25m-12-12v24" stroke="#a0ae90" strokeLinecap="round"/>
     <g transform="translate(142 92) rotate(-13 72 104)" filter="url(#shadow)">
       <rect width="149" height="205" rx="12" fill="#e2ead7" stroke="#a8b79a"/>

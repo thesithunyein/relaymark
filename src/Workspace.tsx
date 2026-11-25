@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowDownLeft, ArrowRight, ArrowUpRight, FileText, Plus, RefreshCw } from 'lucide-react'
+import { ArrowDownLeft, ArrowRight, ArrowUpRight, FileText, Fingerprint, Plus, RefreshCw } from 'lucide-react'
 import { deployment, listRequests, message, sameAddress, shortAddress } from './chain'
 import { savedDraft } from './documents'
 import { ErrorText, Status } from './ui'
@@ -11,7 +11,7 @@ type Page = Awaited<ReturnType<typeof listRequests>>
 const filters = ['All', 'Sent', 'Received'] as const
 
 export function Workspace() {
-  const { active, setOpen } = useWallet()
+  const { active } = useWallet()
   const account = active?.account
   const [page, setPage] = useState<Page>()
   const [busy, setBusy] = useState(false)
@@ -47,22 +47,27 @@ export function Workspace() {
   const visible = page?.records.filter(({ record }) => filter === 'All'
     || (filter === 'Sent' ? sameAddress(record.author, account) : sameAddress(record.reviewer, account))) ?? []
 
-  if (!account) return <Landing connect={() => setOpen(true)} />
+  if (!account) return <Landing />
 
   return <section className="workspace" aria-labelledby="workspace-title">
-      <div className="section-heading">
-        <div><h2 id="workspace-title">Your requests</h2><p>Review drafts and track decisions in one place.</p></div>
-        <div className="workspace-actions">
-          <button className="button secondary" type="button" onClick={() => setRefresh(i => i + 1)} disabled={busy}><RefreshCw size={16} /> Refresh</button>
-          <Link to="/new" className="button primary"><Plus size={16} /> New request</Link>
-        </div>
+    <div className="workspace-overview">
+      <div><h1 id="workspace-title">Your requests</h1><p>Review drafts and track decisions.</p></div>
+      <div className="workspace-actions">
+        <Link to="/verify" className="button secondary"><Fingerprint size={16} /> Verify a receipt</Link>
+        <Link to="/new" className="button primary"><Plus size={16} /> New request</Link>
       </div>
-      <div className="tabs" aria-label="Request filters">
-        {filters.map(item => <button key={item} type="button" aria-pressed={filter === item} onClick={() => setFilter(item)}>{item}</button>)}
+    </div>
+    <div className="request-panel">
+      <div className="request-toolbar">
+        <div className="tabs" role="group" aria-label="Request filters">
+          {filters.map(item => <button key={item} type="button" aria-pressed={filter === item} onClick={() => setFilter(item)}>{item}</button>)}
+        </div>
+        <button className="icon-button" type="button" aria-label="Refresh requests" title="Refresh requests"
+          onClick={() => setRefresh(i => i + 1)} disabled={busy}><RefreshCw size={17} aria-hidden="true" /></button>
       </div>
       <ErrorText>{error}</ErrorText>
-      {busy && !page && <div className="request-panel" role="status"><div className="skeleton" /><div className="skeleton" /></div>}
-      {visible.length > 0 && <ul className="request-panel request-list">
+      {busy && !page && <div role="status" aria-label="Loading requests"><div className="skeleton" /><div className="skeleton" /></div>}
+      {visible.length > 0 && <ul className="request-list">
         {visible.map(({ id, record }) => {
           const sent = sameAddress(account, record.author)
           const local = savedDraft(id)
@@ -76,11 +81,12 @@ export function Workspace() {
           </li>
         })}
       </ul>}
-      {!busy && !error && visible.length === 0 && <div className="request-panel empty">
-        <span className="icon-block"><FileText size={21} /></span>
-        <div><h3>No requests here yet</h3>
-          <p>Send a draft to get a recorded decision.</p></div>
+      {!busy && !error && visible.length === 0 && <div className="empty">
+        <span className="icon-block"><FileText size={21} aria-hidden="true" /></span>
+        <div><h3>{filter === 'All' ? 'No requests yet' : filter === 'Sent' ? 'Nothing sent yet' : 'Nothing received yet'}</h3>
+          <p>{filter === 'Received' ? 'Requests sent to your wallet appear here.' : 'Send a draft when you’re ready for a decision.'}</p></div>
       </div>}
       {!!page?.next && <button className="button secondary more" type="button" onClick={more} disabled={busy}>{busy ? 'Loading…' : 'Load more'}</button>}
-    </section>
+    </div>
+  </section>
 }
