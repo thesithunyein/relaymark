@@ -12,7 +12,7 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "@fontsource-variable/outfit": "^5.3.0",
+    "@fontsource-variable/google-sans": "^5.3.2",
     "lucide-react": "^1.79.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

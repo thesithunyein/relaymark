@@ -1,6 +1,6 @@
 # Relaymark
 
 Pale olive canvas, lime for the primary feature, and ink green for actions.
-Use Outfit Variable throughout. Set clear headings and group related tools on
+Use Google Sans Variable throughout. Set clear headings and group related tools on
 quiet, rounded panels. The relay mark joins two forms at a shared edge.
 Use short verbs for actions and explain gas, link sharing, and withdrawal in context.

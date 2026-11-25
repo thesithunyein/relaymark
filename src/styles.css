@@ -1,6 +1,6 @@
 :root {
   color-scheme: light;
-  --font: "Outfit Variable", system-ui, sans-serif;
+  --font: "Google Sans Variable", system-ui, sans-serif;
   font-family: var(--font);
   --canvas: #f1f2eb;
   --paper: #fbfcf7;
