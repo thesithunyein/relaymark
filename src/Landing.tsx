@@ -32,7 +32,7 @@ export function Landing() {
           </svg>
         </div>
         <ReceiptLookup embedded />
-        <p className="board-note"><ShieldCheck size={16} aria-hidden="true" /> No wallet needed.</p>
+        <p className="board-note"><ShieldCheck size={16} aria-hidden="true" /> No wallet needed to verify.</p>
       </section>
     </section>
 
