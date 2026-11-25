@@ -35,14 +35,14 @@ function WalletDialog() {
     {active ? <><p className="dialog-copy">{active.name}</p><p className="full-address">{active.account}</p>
       <button className="button secondary" type="button" onClick={disconnect}>Disconnect</button></> : <>
       <p className="dialog-copy">Use the wallet that holds your Agent ID.</p>
-      {choices.map(choice => <button key={choice.id} className="wallet-option" type="button" disabled={busy || !!choice.unavailable}
+      {choices.map(choice => <button key={choice.id} className="wallet-option" type="button" disabled={busy}
         onClick={async () => {
           setBusy(true); setError('')
           try { await connect(choice) } catch (err) { setError(message(err)) } finally { setBusy(false) }
         }}>
         <WalletLogo icon={choice.icon} />
-        <span>{choice.name}{choice.unavailable && <small>{choice.unavailable}</small>}</span>
-        {!choice.unavailable && <ArrowRight size={16} aria-hidden="true" />}
+        <span>{choice.name}</span>
+        <ArrowRight size={16} aria-hidden="true" />
       </button>)}
       {!choices.length && <p className="hint">Open Relaymark in a wallet browser, or use the wallet CLI.</p>}
       <button className="text-button" type="button" aria-expanded={advanced} onClick={() => setAdvanced(value => !value)}><SquareTerminal size={16} /> Use wallet CLI</button>

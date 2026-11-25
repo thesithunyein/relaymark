@@ -192,8 +192,6 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
 .dialog-copy { font-size: 13px; color: var(--muted); margin: 8px 0 14px; }
 .wallet-option { width: 100%; min-height: 48px; display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px; align-items: center; text-align: left; background: var(--canvas); border: 1px solid var(--line); border-radius: 8px; margin: 6px 0; padding: 7px 10px; color: var(--action); font-weight: 750; }
 .wallet-option:not(:disabled):hover { background: var(--soft); }
-.wallet-option:disabled:has(small) { opacity: 1; color: var(--muted); }
-.wallet-option small { display: block; margin-top: 3px; font-size: 12px; font-weight: 400; }
 .wallet-logo { display: block; width: 24px; height: 24px; object-fit: contain; border-radius: 5px; }
 .cli-instructions { display: grid; gap: 7px; margin: 8px 0; }
 .cli-instructions p svg { vertical-align: middle; }
@@ -246,9 +244,19 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
   .button, .text-button, .request-row { transition: background-color 150ms ease, border-color 150ms ease; }
 }
 
+@media (min-width: 761px) {
+  .main-shell:has(> :is(.landing, .verify-page)) { display: flex; flex-direction: column; }
+  .landing, .verify-page { flex: 1; padding-block: clamp(16px, 2.1vw, 30px); }
+  .landing { display: grid; }
+  .launch-board { grid-template-rows: auto 1fr; }
+  .landing-workflow { display: flex; flex-direction: column; }
+  .workflow-list { flex: 1; align-content: space-between; }
+  .verify-page .resource-intro { justify-content: center; }
+}
+
 @media (min-width: 761px) and (max-height: 740px) {
   .header-shell { min-height: 68px; }
-  .landing { --board-pad: 22px; padding-top: 16px; }
+  .landing { --board-pad: 22px; }
   .launch-primary, .lookup-card, .landing-workflow { padding-block: 18px; }
   .launch-primary h1 { font-size: clamp(48px, 5.75vw, 68px); }
   .lookup-card .receipt-lookup { margin-top: 10px; }

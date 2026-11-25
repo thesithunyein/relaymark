@@ -8,7 +8,6 @@ type WalletChoice = {
   id: string
   provider: EIP1193Provider
   icon?: string
-  unavailable?: string
 }
 type ProviderAnnouncement = {
   provider: EIP1193Provider
@@ -33,30 +32,37 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
+    const excludedProviders = new Set<EIP1193Provider>()
     const add = (event: Event) => {
       const detail = (event as CustomEvent<ProviderAnnouncement>).detail
       if (typeof detail?.provider?.request !== 'function' || typeof detail.info?.uuid !== 'string'
           || !detail.info.uuid || typeof detail.info.name !== 'string' || !detail.info.name.trim()) return
       const { provider, info } = detail
       const name = info.name.trim()
+      // QoreX's injected EVM provider cannot sign BNB Smart Chain transactions.
+      if (info.rdns === 'network.qore.qorex' || name.toLowerCase() === 'qorex') {
+        excludedProviders.add(provider)
+        setChoices(current => current.some(item => item.provider === provider)
+          ? current.filter(item => item.provider !== provider) : current)
+        return
+      }
       const announcedIcon = typeof info.icon === 'string' && /^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(info.icon)
         ? info.icon : undefined
       const isPhantom = info.rdns === 'app.phantom' || name.toLowerCase() === 'phantom'
       const icon = isPhantom ? phantomIcon : announcedIcon
-      // QoreX announces an EVM provider for account and chain reads only.
-      const unavailable = info.rdns === 'network.qore.qorex' || (!info.rdns && name.toLowerCase() === 'qorex')
-        ? 'BNB Smart Chain signing unavailable.' : undefined
       setChoices(current => {
         const announced = current.filter(item => item.id !== 'injected')
         if (announced.some(item => item.provider === provider || item.id === info.uuid)) return current
-        return [...announced, { provider, name, id: info.uuid, icon, unavailable }]
+        return [...announced, { provider, name, id: info.uuid, icon }]
       })
     }
     window.addEventListener('eip6963:announceProvider', add)
     window.dispatchEvent(new Event('eip6963:requestProvider'))
     const timer = window.setTimeout(() => {
       const provider = (window as Window & { ethereum?: EIP1193Provider }).ethereum
-      if (provider) setChoices(current => current.length ? current : [{ provider, name: 'Browser wallet', id: 'injected' }])
+      if (provider && !excludedProviders.has(provider)) {
+        setChoices(current => current.length ? current : [{ provider, name: 'Browser wallet', id: 'injected' }])
+      }
     }, 250)
     return () => {
       clearTimeout(timer)
@@ -80,7 +86,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, [active?.provider])
 
   const connect = async (choice: WalletChoice) => {
-    if (choice.unavailable) throw new Error(choice.unavailable)
     const accounts = await choice.provider.request({ method: 'eth_requestAccounts' })
     if (!accounts[0]) throw new Error('Choose an account in your wallet.')
     setActive({ account: getAddress(accounts[0]), name: choice.name, provider: choice.provider })
