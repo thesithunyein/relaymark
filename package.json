@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "check": "tsc --noEmit",
+    "check:release": "node scripts/check-release.mjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "deploy:wallet": "node scripts/deploy-wallet.mjs"

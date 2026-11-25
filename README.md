@@ -152,6 +152,21 @@ Copy `.env.example` to `.env.local` and set `VITE_CONTRACT_ADDRESS` to enable co
 
 For isolated testing, start Anvil, deploy a test Agent ID registry and Relaymark, then run `npm run dev -- --mode localchain`. This mode supports overrides for `VITE_AGENT_ID_ADDRESS`, `VITE_CONTRACT_ADDRESS`, and `VITE_BSC_RPC_URL`. The production build uses the official registry on BNB Smart Chain.
 
+## Check release approval
+
+```sh
+npm run check:release -- <receipt-number> <notes-file> <reviewer-address>
+```
+
+The check reads BNB Smart Chain and exits successfully when the receipt has an
+active approval by the expected reviewer and the file matches the approved text.
+It uses the same UTF-8 fingerprint and line-ending normalization as the app.
+The **Relaymark release approval** workflow runs this check on a selected ref.
+To enforce it in a publishing workflow in this repository, call
+`.github/workflows/release-approval.yml` as a reusable workflow and make the
+publishing job depend on it. Pass a reviewer address set by the release owner.
+The publishing job should use the same notes from the same commit.
+
 ## Deploy
 
 1. Deploy `contracts/Relaymark.sol:Relaymark` with the official registry as its constructor argument. Use the compiler settings in `foundry.toml`.

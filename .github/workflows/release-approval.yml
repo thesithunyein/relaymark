@@ -1,0 +1,52 @@
+name: Relaymark release approval
+
+on:
+  workflow_dispatch:
+    inputs:
+      receipt_id:
+        description: Relaymark receipt number
+        required: true
+        type: string
+      notes_file:
+        description: Path to the exact release notes
+        default: RELEASE_NOTES.md
+        required: true
+        type: string
+      reviewer:
+        description: Expected reviewer wallet address
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      receipt_id:
+        required: true
+        type: string
+      notes_file:
+        required: true
+        type: string
+      reviewer:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  approval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Check the receipt
+        env:
+          RECEIPT_ID: ${{ inputs.receipt_id }}
+          NOTES_FILE: ${{ inputs.notes_file }}
+          REVIEWER: ${{ inputs.reviewer }}
+        run: npm run check:release -- "$RECEIPT_ID" "$NOTES_FILE" "$REVIEWER"
