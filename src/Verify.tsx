@@ -29,7 +29,9 @@ export function ReceiptLookup({ embedded = false }: { embedded?: boolean }) {
       <div className="lookup-controls">
         <input ref={field} id={id} value={input} placeholder="Paste the receipt link" autoComplete="off" spellCheck={false}
           aria-invalid={!!error} aria-describedby={error ? id + '-error' : undefined} onChange={e => { setInput(e.target.value); setError('') }} />
-        <button type="submit" className="button primary" disabled={!deployment}>Open receipt <ArrowRight size={17} /></button>
+        <button type="submit" className={embedded ? 'button secondary' : 'button primary'} disabled={!deployment}>
+          Open receipt <ArrowRight size={17} aria-hidden="true" />
+        </button>
       </div>
       {error && <p id={id + '-error'} className="error" role="alert">{error}</p>}
     </div>

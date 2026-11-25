@@ -11,21 +11,6 @@ export function Mark({ className = '' }: { className?: string }) {
   return <img className={className} src={markSource} width="36" height="36" alt="" />
 }
 
-export function ReceiptArt() {
-  return <svg className="receipt-art" viewBox="0 0 330 164" fill="none" aria-hidden="true">
-    <rect x="28" y="38" width="116" height="104" rx="18" fill="#cfdfa0" stroke="#a5b779" />
-    <path d="M47 66h43m-43 15h62m-62 15h49" stroke="#84985f" strokeWidth="3" strokeLinecap="round" />
-    <path d="M95 57h32m-7-7 7 7-7 7" stroke="#547043" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    <rect x="134" y="13" width="152" height="132" rx="19" fill="#b5c884" />
-    <rect x="128" y="8" width="152" height="132" rx="19" fill="#fbfcf7" stroke="#a5b779" />
-    <image href={markSource} x="146" y="22" width="34" height="34" />
-    <path d="M148 72h106" stroke="#dce0d4" />
-    <path d="M148 88h62m-62 13h79m-79 13h48" stroke="#a7b59d" strokeWidth="3" strokeLinecap="round" />
-    <rect x="249" y="100" width="53" height="53" rx="16" fill="#263e32" />
-    <path d="m265 127 7 7 14-15" stroke="#d9e8a9" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-}
-
 export function Status({ status }: { status: number }) {
   return <span className={'status status-' + status}><i />{labels[status] ?? 'Unknown'}</span>
 }
