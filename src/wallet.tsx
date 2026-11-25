@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { getAddress, type Address, type EIP1193Provider } from 'viem'
 import { addressInput } from './chain'
+import phantomIcon from './assets/phantom.png'
 
 type WalletChoice = {
   name: string
@@ -38,8 +39,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           || !detail.info.uuid || typeof detail.info.name !== 'string' || !detail.info.name.trim()) return
       const { provider, info } = detail
       const name = info.name.trim()
-      const icon = typeof info.icon === 'string' && /^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(info.icon)
+      const announcedIcon = typeof info.icon === 'string' && /^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(info.icon)
         ? info.icon : undefined
+      const isPhantom = info.rdns === 'app.phantom' || name.toLowerCase() === 'phantom'
+      const icon = isPhantom ? phantomIcon : announcedIcon
       // QoreX announces an EVM provider for account and chain reads only.
       const unavailable = info.rdns === 'network.qore.qorex' || (!info.rdns && name.toLowerCase() === 'qorex')
         ? 'BNB Smart Chain signing unavailable.' : undefined
